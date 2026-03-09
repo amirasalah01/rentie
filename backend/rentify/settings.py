@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'properties',
+    'django_filters', # for the filters
 
     # Third-party apps
     'rest_framework',
@@ -45,7 +47,6 @@ INSTALLED_APPS = [
 
     # Your apps
     'users.apps.UsersConfig',
-    'properties.apps.PropertiesConfig',
     'messaging.apps.MessagingConfig',
 ]
 
@@ -157,6 +158,9 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 # ============================================
