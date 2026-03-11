@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'properties',
+    'properties', # my app
     'django_filters', # for the filters
 
     # Third-party apps
