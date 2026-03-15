@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Property, Review
+from .models import Property, Review, Favorite
 from users.serializers import UserSerializer
 
 
@@ -8,16 +8,17 @@ class PropertySerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
     average_rating = serializers.SerializerMethodField()
     review_count = serializers.SerializerMethodField()
+    is_favorite = serializers.SerializerMethodField()
 
     class Meta:
         model = Property
         fields = [
             'id', 'owner', 'title', 'description', 'address', 'city', 'country',
             'bedrooms', 'bathrooms', 'square_feet', 'property_type',
-            'price_per_month', 'available_from', 'is_available',
-            'average_rating', 'review_count', 'created_at', 'updated_at'
+            'price_per_month', 'available_from', 'is_available', 'view_count',
+            'average_rating', 'review_count', 'is_favorite', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'owner', 'view_count', 'created_at', 'updated_at']
 
     def get_average_rating(self, obj):
         reviews = obj.reviews.all()
@@ -29,6 +30,12 @@ class PropertySerializer(serializers.ModelSerializer):
 
     def get_review_count(self, obj):
         return obj.reviews.count()
+
+    def get_is_favorite(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.favorited_by.filter(user=request.user).exists()
+        return False
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -58,3 +65,13 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['reviewer'] = self.context['request'].user
         return super().create(validated_data)
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    """Serializer for favorites"""
+    property_detail = PropertySerializer(source='property', read_only=True)
+
+    class Meta:
+        model = Favorite
+        fields = ['id', 'property', 'property_detail', 'created_at']
+        read_only_fields = ['id', 'created_at']

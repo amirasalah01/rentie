@@ -2,7 +2,6 @@ from django.db import models
 from users.models import User
 
 
-
 class Property(models.Model):
     """Property listing model"""
     # Owner
@@ -40,6 +39,9 @@ class Property(models.Model):
     # Availability
     available_from = models.DateField()
     is_available = models.BooleanField(default=True)
+
+    # Tracking
+    view_count = models.IntegerField(default=0)
 
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -95,3 +97,28 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.reviewer} - {self.property.title} ({self.rating}★)"
+
+
+class Favorite(models.Model):
+    """User's favorite properties"""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorites'
+    )
+    property = models.ForeignKey(
+        Property,
+        on_delete=models.CASCADE,
+        related_name='favorited_by'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'favorites'
+        verbose_name = 'Favorite'
+        verbose_name_plural = 'Favorites'
+        unique_together = ['user', 'property']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.property.title}"

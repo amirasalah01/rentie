@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from .models import Property, Review
-from .serializers import PropertySerializer, ReviewSerializer, ReviewCreateSerializer
+from .models import Property, Review, Favorite
+from .serializers import PropertySerializer, ReviewSerializer, ReviewCreateSerializer, FavoriteSerializer
 from .filters import PropertyFilter
 
 
@@ -38,6 +38,11 @@ class PropertyDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         obj = super().get_object()
+        # Track views on GET requests
+        if self.request.method == 'GET':
+            obj.view_count += 1
+            obj.save(update_fields=['view_count'])
+        # Check ownership for edit/delete
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
             if obj.owner != self.request.user:
                 raise permissions.PermissionDenied("You can only edit your own properties")
@@ -63,6 +68,33 @@ class MyPropertiesView(generics.ListAPIView):
 
     def get_queryset(self):
         return Property.objects.filter(owner=self.request.user)
+
+
+class PropertySearchView(generics.ListAPIView):
+    """
+    Advanced search and filter for properties
+    """
+    serializer_class = PropertySerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['property_type', 'bedrooms', 'bathrooms', 'is_available']
+    search_fields = ['title', 'description', 'city', 'country', 'address']
+    ordering_fields = ['price_per_month', 'created_at', 'view_count']
+    ordering = ['-created_at']
+
+    def get_queryset(self):
+        queryset = Property.objects.all()
+
+        # Price range filter
+        min_price = self.request.query_params.get('min_price')
+        max_price = self.request.query_params.get('max_price')
+
+        if min_price:
+            queryset = queryset.filter(price_per_month__gte=min_price)
+        if max_price:
+            queryset = queryset.filter(price_per_month__lte=max_price)
+
+        return queryset
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):
@@ -143,3 +175,28 @@ class PropertyRatingView(generics.RetrieveAPIView):
                 '1_star': reviews.filter(rating=1).count(),
             }
         })
+
+
+class FavoriteListCreateView(generics.ListCreateAPIView):
+    """
+    List user's favorite properties or add a favorite
+    """
+    serializer_class = FavoriteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class FavoriteDetailView(generics.DestroyAPIView):
+    """
+    Remove a favorite property
+    """
+    serializer_class = FavoriteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user)
