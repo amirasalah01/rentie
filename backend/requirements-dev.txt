@@ -7,7 +7,7 @@ django-filter==23.5
 drf-spectacular==0.26.5
 python-decouple==3.8
 Pillow==11.0.0
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 
 # Testing Requirements
 pytest==7.4.3
