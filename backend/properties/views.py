@@ -5,8 +5,12 @@ from rest_framework.response import Response
 
 from .filters import PropertyFilter
 from .models import Favorite, Property, Review
-from .serializers import (FavoriteSerializer, PropertySerializer,
-                          ReviewCreateSerializer, ReviewSerializer)
+from .serializers import (
+    FavoriteSerializer,
+    PropertySerializer,
+    ReviewCreateSerializer,
+    ReviewSerializer,
+)
 
 
 class PropertyListCreateView(generics.ListCreateAPIView):

@@ -1,9 +1,16 @@
 from django.urls import path
 
-from .views import (FavoriteDetailView, FavoriteListCreateView,
-                    MyPropertiesView, PropertyDetailView,
-                    PropertyListCreateView, PropertyRatingView,
-                    PropertySearchView, ReviewDetailView, ReviewListCreateView)
+from .views import (
+    FavoriteDetailView,
+    FavoriteListCreateView,
+    MyPropertiesView,
+    PropertyDetailView,
+    PropertyListCreateView,
+    PropertyRatingView,
+    PropertySearchView,
+    ReviewDetailView,
+    ReviewListCreateView,
+)
 
 urlpatterns = [
     # Properties
