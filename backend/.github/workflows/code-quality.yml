@@ -20,7 +20,7 @@ jobs:
         pip install -r requirements-dev.txt
     - name: Run flake8
       working-directory: ./backend
-      run: flake8 . --max-line-length=100
+      run: flake8 .
     - name: Run black
       working-directory: ./backend
       run: black . --check
