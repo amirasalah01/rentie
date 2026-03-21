@@ -1,7 +1,13 @@
 from django.urls import path
 
-from .views import (ConversationView, InboxView, MarkAsReadView,
-                    MessageDetailView, SendMessageView, SentView)
+from .views import (
+    ConversationView,
+    InboxView,
+    MarkAsReadView,
+    MessageDetailView,
+    SendMessageView,
+    SentView,
+)
 
 urlpatterns = [
     # Send message
