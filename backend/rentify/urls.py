@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import include, path
+
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -7,7 +8,6 @@ from drf_spectacular.views import (
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 
 class RootView(APIView):
     """Root API endpoint"""
