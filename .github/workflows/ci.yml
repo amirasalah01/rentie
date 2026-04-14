@@ -1,16 +1,15 @@
 name: CI - Django Backend Tests
 
-
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     env:
       GITHUB_ACTIONS: true
       TESTING: true
@@ -18,26 +17,25 @@ jobs:
       DEBUG: False
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Python 3.13
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.13'
-    
-    - name: Install dependencies
-         
-      working-directory: ./backend
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools          # pkg_resources fix for Python 3.13
-        pip install -r requirements-dev.txt
-        pip install --upgrade djangorestframework-simplejwt
-    
-    - name: Run migrations
-      working-directory: ./backend
-      run: python manage.py migrate
-    
-    - name: Run tests with pytest
-      working-directory: ./backend
-      run: pytest -v --cov=. --cov-report=xml
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install "setuptools<70"
+          pip install -r requirements-dev.txt
+
+      - name: Run migrations
+        working-directory: ./backend
+        run: python manage.py migrate
+
+      - name: Run tests with pytest
+        working-directory: ./backend
+        run: pytest -v --cov=. --cov-report=xml
